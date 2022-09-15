@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(Clipper2 LANGUAGES C CXX)
+project(Clipper2 LANGUAGES C CXX VERSION 2.0.0)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD 17)
@@ -117,6 +117,7 @@ if(CLIPPER2_TESTS)
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
   endif()
   set(BUILD_GMOCK OFF)
+  set(INSTALL_GTEST OFF)
   include(GoogleTest)
 
   add_subdirectory("${PROJECT_SOURCE_DIR}/Tests/googletest/")
@@ -160,3 +161,28 @@ if(CLIPPER2_TESTS)
   file(COPY ../Tests/Lines.txt DESTINATION ${CMAKE_BINARY_DIR} FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ )
   file(COPY ../Tests/Polygons.txt DESTINATION ${CMAKE_BINARY_DIR} FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ )
 endif()
+
+# install stuff
+install(TARGETS Clipper2 Clipper2Z
+  EXPORT Clipper2-export
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
+
+include(CMakePackageConfigHelpers)
+set(INCLUDE_INSTALL_DIR include/ ... CACHE )
+set(LIB_INSTALL_DIR lib/ ... CACHE )
+set(SYSCONFIG_INSTALL_DIR etc/foo/ ... CACHE )
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(Clipper2Config.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/Clipper2Config.cmake
+  INSTALL_DESTINATION ${LIB_INSTALL_DIR}/Clipper2/cmake
+  PATH_VARS INCLUDE_INSTALL_DIR SYSCONFIG_INSTALL_DIR)
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/Clipper2ConfigVersion.cmake
+  VERSION 2.0.0
+  COMPATIBILITY SameMajorVersion )
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Clipper2Config.cmake
+              ${CMAKE_CURRENT_BINARY_DIR}/Clipper2ConfigVersion.cmake
+        DESTINATION ${LIB_INSTALL_DIR}/Clipper2/cmake )
